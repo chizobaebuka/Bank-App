@@ -1,0 +1,5 @@
+STEPS TAKEN IN BUILDING THE APP
+1. install npm i express dotenv cors typescript sequelize pg pg-hstore moment chalk bcryptjs jsonwebtoken uuid body-parser @sendgri
+d/mail
+2. npm i --save-dev @types/bcryptjs @types/chalk @types/cors @types/express @types/jsonwebtoken @types/uuid ts-node-dev ts-
+node typescript
