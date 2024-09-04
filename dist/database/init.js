@@ -12,10 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const user_model_1 = __importDefault(require("../models/user.model"));
 const index_1 = __importDefault(require("./index"));
 const DbInitialize = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield index_1.default.authenticate();
+        user_model_1.default.sync({ alter: false });
     }
     catch (err) {
         console.log("Unable to connect to the database", err);
