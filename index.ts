@@ -1,7 +1,8 @@
 import express, { Request, Response, NextFunction, Application } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import DbInitialize from './src/database/init'
+import DbInitialize from './src/database/init';
+import userRouter from './src/routes/user.route';
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.use((err: TypeError, req: Request, res: Response, next: NextFunction) => {
         }
     } catch (e: any) {}
 })
+
+app.use('/api/user', userRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.send(`Welcome to ${ process.env.APP_NAME }`)
