@@ -25,6 +25,7 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3",
     "uuid": "^10.0.0",
+    "winston": "^3.14.2",
     "yup": "^1.4.0"
   },
   "devDependencies": {

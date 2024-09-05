@@ -11,6 +11,10 @@ class UserDataSource implements IUserDataSource {
         return await UserModel.create(data);
     }
 
+    async updateOne(searchBy: IFindUserQuery, data: Partial<IUser>): Promise<void> {
+        await UserModel.update(data, { where: searchBy.where });
+    }
+
 }
 
 export default UserDataSource;

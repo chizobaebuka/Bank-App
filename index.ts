@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import DbInitialize from './src/database/init';
 import userRouter from './src/routes/user.route';
+import accountRouter from './src/routes/account-route';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use((err: TypeError, req: Request, res: Response, next: NextFunction) => {
 })
 
 app.use('/api/user', userRouter);
+app.use('/api/account', accountRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.send(`Welcome to ${ process.env.APP_NAME }`)

@@ -16,10 +16,17 @@ const forgotPasswordSchema = yup.object({
     email: yup.string().email().lowercase().trim().required(),
 })
 
+const resetPasswordSchema = yup.object({
+    code: yup.string().trim().required(),
+    email: yup.string().email().lowercase().trim().required(),
+    password: yup.string().min(6).required(),
+})
+
 const validationSchema = {
     registerSchema,
     loginSchema,
-    forgotPasswordSchema
+    forgotPasswordSchema,
+    resetPasswordSchema,
 }
 
 export default validationSchema;

@@ -8,6 +8,7 @@ import Utility from "../utils/index.utils";
 import { ResponseCode } from "../interfaces/enum/code-enum";
 import TokenService from "../services/token-service";
 import EmailService from "../services/email-service";
+import moment from "moment";
 
 class UserController {
     private userService: UserService;
@@ -96,14 +97,33 @@ class UserController {
         }
     }
 
-    // async resetPassword (req: Request, res: Response) {
-    //     try {
-    //         const response = await this.userService.resetPassword(req.body);
-    //         res.status(200).json(response);
-    //     } catch (e: any) {
-    //         res.status(500).json({ status: false, message: e.message });
-    //     }
-    // }
+    async resetPassword (req: Request, res: Response) {
+        try {
+            const { email, code, password } = req.body;
+            const params = { email, code, password };
+            let isValidToken = await this.tokenService.getTokenByField({ key: params.email, code: params.code, type: this.tokenService.TokenTypes.FORGOT_PASSWORD, status: this.tokenService.TokenStatus.NOT_USED });
+            if (!isValidToken) {
+                return Utility.handleError(res, "Token has expired", ResponseCode.NOT_FOUND);
+            }
+
+            if(isValidToken && moment(isValidToken.expires).diff(moment(), 'minutes') <= 0) {
+                return Utility.handleError(res, "Token has expired", ResponseCode.NOT_FOUND);
+            }
+
+            let user = await this.userService.getUserByField({ email: params.email });
+            if (!user) {
+                return Utility.handleError(res, "User Does Not Exist", ResponseCode.NOT_FOUND);
+            }
+
+            const _password = bcrypt.hashSync(params.password, 10);
+            await this.userService.updateRecord({id: user.id}, { password: _password });
+            await this.tokenService.updateRecord({id: isValidToken.id}, { status: this.tokenService.TokenStatus.USED });
+
+            return Utility.handleSuccess(res, "Password Reset Successful", {}, ResponseCode.SUCCESS);
+        } catch (e: any) {
+            return Utility.handleError(res, (e as TypeError).message, ResponseCode.SERVER_ERROR);
+        }
+    }
 }
 
 export default UserController;

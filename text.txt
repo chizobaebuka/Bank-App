@@ -9,9 +9,11 @@ node typescript
 5. for data validation we are making use of yup 
 6. For password hashing we are making use of bcryptjs
 7. For mail sending functionality we are making use of nodemailer
+8. For logging we are using winston  -- helps know whats happening in yuor application by looking at the logger file (npm i winston)
 
 SETTING UP GMAIL FOR NODEMAILER CONFIGURATION
 1. Click on your google account
 2. Go to security
 3. Click on 2-step verification
 4. click on app password 
+
