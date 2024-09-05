@@ -7,3 +7,4 @@ node typescript
 4. register a model within the postgres database 
     to do this under the init.ts sync the model using model.sync({ alter: false })
 5. for data validation we are making use of yup 
+6. For password hashing we are making use of bcryptjs
