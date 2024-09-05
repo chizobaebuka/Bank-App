@@ -6,4 +6,4 @@ node typescript
 3. create the user model after setting up the postgres database and testing for  connections
 4. register a model within the postgres database 
     to do this under the init.ts sync the model using model.sync({ alter: false })
-5. 
+5. for data validation we are making use of yup 
