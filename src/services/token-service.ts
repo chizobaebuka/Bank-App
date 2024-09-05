@@ -24,7 +24,7 @@ class TokenService {
         return this.tokenDataSource.fetchOne(query);
     }
 
-    async createForgotPasswordToken (email: string): Promise<IToken | null>  {
+    async createForgotPasswordToken (email: string): Promise<IToken>  {
         const tokenData = {
             key: email, 
             type: "FORGOT_PASSWORD",
