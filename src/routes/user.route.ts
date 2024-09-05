@@ -14,9 +14,9 @@ const createUserRoute = () => {
         return userController.registerUser(req, res);
     })
 
-    // router.post('/login', (req: Request, res: Response) => {
-    //     return userController.loginUser(req, res);
-    // })
+    router.post('/login', validator(validationSchema.loginSchema), (req: Request, res: Response) => {
+        return userController.loginUser(req, res);
+    })
 
     // router.post('/forgot-password', (req: Request, res: Response) => {
     //     return userController.forgotPassword(req, res);

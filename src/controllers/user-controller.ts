@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
+import jwt from 'jsonwebtoken';
 import UserService from "../services/user-service";
 import { AccountStatus, EmailStatus, UserRoles } from "../interfaces/enum/user-enum";
 import { IUserCreationBody } from "../interfaces/user.interface";
@@ -28,7 +29,6 @@ class UserController {
                 accountStatus: AccountStatus.ACTIVE,
             } as IUserCreationBody;
 
-            // hashing the password 
             newUser.password = bcrypt.hashSync(newUser.password, 10);
 
             const userExists = await this.userService.getUserByField({ email: newUser.email });
@@ -40,23 +40,38 @@ class UserController {
             user.password = '';
 
             return Utility.handleSuccess(res, 'User Registered Successfully', { user }, ResponseCode.SUCCESS);
-
-
-            // const response = await this.userService.createUser(req.body);
-            // res.status(201).json(response);
         } catch (e: any) {
             res.status(500).json({ status: false, message: e.message });
         }
     }
 
-    // async loginUser (req: Request, res: Response) {
-    //     try {
-    //         const response = await this.userService.loginUser(req.body);
-    //         res.status(200).json(response);
-    //     } catch (e: any) {
-    //         res.status(500).json({ status: false, message: e.message });
-    //     }
-    // }
+    async loginUser (req: Request, res: Response) {
+        try {
+            const params = { ...req.body };
+            const user = await this.userService.getUserByField({ email: params.email });
+            if (!user) {
+                return Utility.handleError(res, 'Invalid Login Credentials', ResponseCode.NOT_FOUND);
+            }
+
+            const isValidPassword = await bcrypt.compare(params.password, user.password);
+            if (!isValidPassword) {
+                return Utility.handleError(res, 'Invalid Login Credentials', ResponseCode.INVALID_DATA);
+            }
+
+            const token = jwt.sign({ 
+                id: user.id, 
+                email: user.email, 
+                lastname: user.lastname,
+                firstname: user.firstname,
+                role: user.role,
+            }, process.env.JWT_KEY as string, { expiresIn: '1h' });
+
+            return Utility.handleSuccess(res, 'Login Successful', { user, token }, ResponseCode.SUCCESS);
+
+        } catch (err: any) {
+            return Utility.handleError(res, (err as TypeError).message, ResponseCode.SERVER_ERROR);
+        }
+    }
 
     // async forgotPassword (req: Request, res: Response) {
     //     try {
