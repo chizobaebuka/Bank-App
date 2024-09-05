@@ -6,12 +6,15 @@ import { AccountStatus, EmailStatus, UserRoles } from "../interfaces/enum/user-e
 import { IUserCreationBody } from "../interfaces/user.interface";
 import Utility from "../utils/index.utils";
 import { ResponseCode } from "../interfaces/enum/code-enum";
+import TokenService from "../services/token-service";
 
 class UserController {
     private userService: UserService;
+    private tokenService: TokenService;
 
-    constructor(_userService: UserService) {
+    constructor(_userService: UserService, _tokenService: TokenService) {
         this.userService = _userService;
+        this.tokenService = _tokenService;
     }
 
     async registerUser (req: Request, res: Response) {
@@ -73,14 +76,21 @@ class UserController {
         }
     }
 
-    // async forgotPassword (req: Request, res: Response) {
-    //     try {
-    //         const response = await this.userService.forgotPassword(req.body);
-    //         res.status(200).json(response);
-    //     } catch (e: any) {
-    //         res.status(500).json({ status: false, message: e.message });
-    //     }
-    // }
+    async forgotPassword (req: Request, res: Response) {
+        try {
+            const params = { ...req.body };
+            const user = await this.userService.getUserByField({ email: params.email });
+            if (!user) {
+                return Utility.handleError(res, 'Account Does Not Exist', ResponseCode.NOT_FOUND);
+            }
+            const token = await this.tokenService.createForgotPasswordToken(params.email);
+            // await EmailService.sendForgotPasswordMail(params.email, token.code);
+
+            return Utility.handleSuccess(res, 'Password Reset Code Sent to Email', { }, ResponseCode.SUCCESS);
+        } catch (e: any) {
+            return Utility.handleError(res, (e as TypeError).message, ResponseCode.SERVER_ERROR);
+        }
+    }
 
     // async resetPassword (req: Request, res: Response) {
     //     try {
