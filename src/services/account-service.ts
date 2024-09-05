@@ -9,11 +9,6 @@ class AccountService {
         this.accountDataSource = _accountDataSource;
     }
 
-    async getAccountByField(record: Partial<IAccount>) {
-        const query = { where: { ...record }, raw: true} as IFindAccountQuery;
-        return this.accountDataSource.fetchOne(query);
-    }
-
     private generateAccountNumber() {
         let accountNumber = "";
         for(let i = 0; i < 10; i++) {
@@ -52,10 +47,27 @@ class AccountService {
         return this.accountDataSource.create(record);
     }
 
+    async getAccountsByUserId(userId: string) {
+        const query = { 
+            where: { userId },
+            raw: true,
+            returning: false
+        }
+
+        return this.accountDataSource.fetchAll(query);
+    }
+
+    async getAccountByField(record: Partial<IAccount>) {
+        const query = { where: { ...record }, raw: true} as IFindAccountQuery;
+        return this.accountDataSource.fetchOne(query);
+    }
+
     async updateRecord(searchBy: Partial<IAccount>, record: Partial<IAccount>): Promise<void> {
         const query = { where: { ...searchBy } } as IFindAccountQuery;
         return this.accountDataSource.updateOne(query, record);
     }
+
+
 }
 
 export default AccountService;

@@ -36,6 +36,10 @@ const generateCode = (num: number = 15) => {
     return result.toUpperCase();
 }
 
+const escapeHtml = (html: string) => {
+    return html.replace(/[&<>"']/g, '')
+}
+
 const Utility = {
     printRed,
     handleError,
@@ -43,6 +47,7 @@ const Utility = {
     generateCode,
     logger,
     isEmpty,
+    escapeHtml
 }
 
 export default Utility;
