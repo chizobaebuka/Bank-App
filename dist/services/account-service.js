@@ -8,7 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const database_1 = __importDefault(require("../database"));
 const account_enum_1 = require("../interfaces/enum/account-enum");
 class AccountService {
     constructor(_accountDataSource) {
@@ -66,6 +70,15 @@ class AccountService {
         return __awaiter(this, void 0, void 0, function* () {
             const query = { where: Object.assign({}, searchBy) };
             return this.accountDataSource.updateOne(query, record);
+        });
+    }
+    topUpBalance(accountId_1, amount_1) {
+        return __awaiter(this, arguments, void 0, function* (accountId, amount, options = {}) {
+            const filter = Object.assign({ where: { id: accountId } }, options);
+            const update = {
+                balance: database_1.default.literal('balance + ' + amount)
+            };
+            return this.accountDataSource.updateOne(filter, update);
         });
     }
 }

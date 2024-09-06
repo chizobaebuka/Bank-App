@@ -5,8 +5,13 @@ const initiatePaystackDepositSchema = yup.object({
     accountId: yup.string().trim().required(),
 })
 
+const verifyPaystackTransactionSchema = yup.object({
+    reference: yup.string().trim().required(),
+})
+
 const validationSchema = {
     initiatePaystackDepositSchema,
+    verifyPaystackTransactionSchema
 }
 
 export default validationSchema;

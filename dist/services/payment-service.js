@@ -21,29 +21,56 @@ class PaymentService {
     static generatePaystackPaymentUrl(email, amount) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const amountInKobo = amount * 100;
+                const amountInKobo = amount * 100; // Convert amount to kobo
                 const params = {
                     email,
                     amount: amountInKobo,
-                    channels: ["card"],
-                    callback_url: `${process.env.PAYSTACK_CALLBACK_URL}`,
+                    channels: ["card"], // Make sure Paystack account supports the channels
+                    callback_url: `${process.env.PAYSTACK_CALLBACK_URL}`, // Ensure this URL is reachable and correct
                     reference: this.generatePaystackReference(),
                 };
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`, // Ensure secret key is correct
+                        'Content-Type': 'application/json',
+                    }
+                };
+                const response = yield axios_1.default.post("https://api.paystack.co/transaction/initialize", params, config);
+                if (response.data && response.data.status) {
+                    return response.data.data; // Return the payment object if successful
+                }
+                console.error('Paystack response status was false:', response.data); // Log Paystack response if status is false
+                return null;
+            }
+            catch (err) {
+                console.error('Error initializing Paystack transaction:', err); // Log the error for better debugging
+                return null;
+            }
+        });
+    }
+    static verifyPaystackPayment(reference, amount) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
                 const config = {
                     headers: {
                         Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
                         'Content-Type': 'application/json',
                     }
                 };
-                const { data } = yield axios_1.default.post("https://api.paystack.co/transaction/initialize", params, config);
+                const { data } = yield axios_1.default.get(`https://api.paystack.co/transaction/verify/${reference}`, config);
+                console.log('Paystack verification response:', data);
                 if (data && data.status) {
-                    return data.data;
+                    const { amount: amountInKobo } = data.data;
+                    if (amountInKobo !== (amount * 100)) {
+                        return false;
+                    }
+                    return true;
                 }
-                return null;
             }
             catch (err) {
-                return null;
+                return false;
             }
+            return false;
         });
     }
 }

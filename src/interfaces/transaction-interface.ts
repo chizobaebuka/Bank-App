@@ -1,4 +1,4 @@
-import { Model, Optional } from "sequelize";
+import { Model, Optional, Transaction } from "sequelize";
 
 export interface ITransactionDetail {
     gateway?: string;
@@ -27,9 +27,9 @@ export interface ITransaction {
 export interface IFindTransactionQuery {
     where: {
         [key: string]: string;
-    },
+    };
+    transaction?:Transaction;
     raw?: boolean;
-    attributes?: string[];
     returning?: boolean;
 }
 

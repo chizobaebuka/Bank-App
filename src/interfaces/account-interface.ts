@@ -1,4 +1,4 @@
-import { FindOptions, Model, Optional } from "sequelize";
+import { FindOptions, Model, Optional, Transaction } from "sequelize";
 
 export interface IAccount {
     id: string;
@@ -18,6 +18,7 @@ export interface IFindAccountQuery {
     raw?: boolean;
     attributes?: string[];
     returning?: boolean;
+    transaction?: Transaction;
 }
 
 export interface IAccountCreationBody extends Optional<IAccount, "id" | "createdAt" | "updatedAt"> {}

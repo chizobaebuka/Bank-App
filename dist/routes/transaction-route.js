@@ -9,12 +9,18 @@ const transaction_controller_1 = __importDefault(require("../controllers/transac
 const transaction_service_1 = __importDefault(require("../services/transaction-service"));
 const transaction_datasource_1 = __importDefault(require("../datasources/transaction-datasource"));
 const transaction_validator_schema_1 = __importDefault(require("../validators/transaction-validator.schema"));
+const account_service_1 = __importDefault(require("../services/account-service"));
+const account_datasource_1 = __importDefault(require("../datasources/account-datasource"));
 const router = express_1.default.Router();
+const accountService = new account_service_1.default(new account_datasource_1.default());
 const transactionService = new transaction_service_1.default(new transaction_datasource_1.default());
-const transactionController = new transaction_controller_1.default(transactionService);
+const transactionController = new transaction_controller_1.default(transactionService, accountService);
 const createTransactionRoute = () => {
     router.post('/initiate-paystack-deposit', (0, index_middleware_1.validator)(transaction_validator_schema_1.default.initiatePaystackDepositSchema), (0, index_middleware_1.Auth)(), (req, res) => {
         return transactionController.initiatePaystackDeposit(req, res);
+    });
+    router.post('/verify-paystack-transaction', (0, index_middleware_1.validator)(transaction_validator_schema_1.default.verifyPaystackTransactionSchema), (0, index_middleware_1.Auth)(), (req, res) => {
+        return transactionController.verifyPaystackTransactionByRef(req, res);
     });
     return router;
 };

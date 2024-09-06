@@ -13,7 +13,7 @@ class TransactionService {
     }
 
     async depositByPaystack(data: Partial<ITransaction>): Promise<ITransaction> {
-        
+
         const deposit = {
             ...data,
             type: TransactionTypes.DEPOSIT,
@@ -21,10 +21,26 @@ class TransactionService {
                 ...data.detail,
                 gateway: TransactionGateWay.PAYSTACK,
             },
-            status: TransactionStatus.IN_PROGRESS,
+            status: "IN_PROGRESS",
         } as ITransactionCreationBody;
 
         return this.transactionDataSource.create(deposit);
+    }
+
+    async fetchTransactionByReference(reference: string): Promise<ITransaction | null> {
+        const query = {
+            where: { reference },
+            raw: true,
+        };
+        return this.transactionDataSource.fetchOne(query);
+    }
+
+    async setStatus(transactionId:string, status: string , options: Partial<IFindTransactionQuery> = {}): Promise<void> {
+        const filter = {where : { id: transactionId }, ...options};
+        const update = {
+            status 
+        }
+        await this.transactionDataSource.updateOne( filter, update as any );
     }
 }
 

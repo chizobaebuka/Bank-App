@@ -20,5 +20,21 @@ class TransactionService {
             return this.transactionDataSource.create(deposit);
         });
     }
+    fetchTransactionByReference(reference_1) {
+        return __awaiter(this, arguments, void 0, function* (reference, options = {}) {
+            const filter = Object.assign({ where: { reference } }, options);
+            return this.transactionDataSource.fetchOne(filter);
+        });
+    }
+    setStatus(transactionId_1, status_1) {
+        return __awaiter(this, arguments, void 0, function* (transactionId, status, options = {}) {
+            const filter = Object.assign({ where: { id: transactionId } }, options);
+            const update = {
+                status,
+                updatedAt: new Date(),
+            };
+            yield this.transactionDataSource.updateOne(filter, update);
+        });
+    }
 }
 exports.default = TransactionService;

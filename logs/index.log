@@ -26,3 +26,24 @@
 2024-09-05 23:19:56 error Cannot read properties of undefined (reading 'id')
 2024-09-05 23:20:14 error Unauthorized Access
 2024-09-06 09:02:15 error firstname is a required field, lastname is a required field, email is a required field, password is a required field
+2024-09-06 13:45:31 error Unauthorized Access
+2024-09-06 13:50:41 error Transaction status not supported
+2024-09-06 13:53:44 error Transaction status not supported
+2024-09-06 13:54:12 error Transaction status not supported
+2024-09-06 13:58:14 error Transaction status not supported
+2024-09-06 13:59:50 error Transaction status not supported
+2024-09-06 14:01:29 error jwt expired
+2024-09-06 14:02:06 error jwt expired
+2024-09-06 14:02:40 error Transaction status not supported
+2024-09-06 14:09:17 error Transaction status not supported
+2024-09-06 14:14:27 error Transaction status not supported
+2024-09-06 14:15:03 error Transaction status not supported
+2024-09-06 14:54:19 error jwt expired
+2024-09-06 14:54:35 error Transaction status not supported
+2024-09-06 14:57:57 error Transaction status not supported
+2024-09-06 14:57:58 error Transaction status not supported
+2024-09-06 14:57:58 error Transaction status not supported
+2024-09-06 14:57:59 error Transaction status not supported
+2024-09-06 14:57:59 error Transaction status not supported
+2024-09-07 00:36:36 error Transaction status not supported
+2024-09-07 00:36:53 error jwt expired
