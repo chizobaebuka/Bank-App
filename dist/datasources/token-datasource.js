@@ -12,21 +12,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const account_model_1 = __importDefault(require("../models/account-model"));
 const token_model_1 = __importDefault(require("../models/token-model"));
-const transaction_model_1 = __importDefault(require("../models/transaction-model"));
-const user_model_1 = __importDefault(require("../models/user.model"));
-const index_1 = __importDefault(require("./index"));
-const DbInitialize = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield index_1.default.authenticate();
-        user_model_1.default.sync({ alter: false });
-        token_model_1.default.sync({ alter: false });
-        account_model_1.default.sync({ alter: false });
-        transaction_model_1.default.sync({ alter: false });
+class TokenDataSource {
+    create(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield token_model_1.default.create(data);
+        });
     }
-    catch (err) {
-        console.log("Unable to connect to the database", err);
+    fetchOne(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield token_model_1.default.findOne({ where: query.where });
+        });
     }
-});
-exports.default = DbInitialize;
+    updateOne(data, query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield token_model_1.default.update(data, { where: query.where });
+        });
+    }
+}
+exports.default = TokenDataSource;

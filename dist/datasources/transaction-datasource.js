@@ -12,21 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const account_model_1 = __importDefault(require("../models/account-model"));
-const token_model_1 = __importDefault(require("../models/token-model"));
 const transaction_model_1 = __importDefault(require("../models/transaction-model"));
-const user_model_1 = __importDefault(require("../models/user.model"));
-const index_1 = __importDefault(require("./index"));
-const DbInitialize = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield index_1.default.authenticate();
-        user_model_1.default.sync({ alter: false });
-        token_model_1.default.sync({ alter: false });
-        account_model_1.default.sync({ alter: false });
-        transaction_model_1.default.sync({ alter: false });
+class TransactionDataSource {
+    fetchOne(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield transaction_model_1.default.findOne({ where: query.where });
+        });
     }
-    catch (err) {
-        console.log("Unable to connect to the database", err);
+    create(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield transaction_model_1.default.create(data);
+        });
     }
-});
-exports.default = DbInitialize;
+    updateOne(searchBy, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield transaction_model_1.default.update(data, { where: searchBy.where });
+        });
+    }
+    fetchAll(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield transaction_model_1.default.findAll({ where: query.where });
+        });
+    }
+}
+exports.default = TransactionDataSource;

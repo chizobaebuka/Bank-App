@@ -25,3 +25,4 @@
 2024-09-05 23:19:34 error Cannot read properties of undefined (reading 'id')
 2024-09-05 23:19:56 error Cannot read properties of undefined (reading 'id')
 2024-09-05 23:20:14 error Unauthorized Access
+2024-09-06 09:02:15 error firstname is a required field, lastname is a required field, email is a required field, password is a required field
