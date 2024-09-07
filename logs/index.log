@@ -47,3 +47,7 @@
 2024-09-06 14:57:59 error Transaction status not supported
 2024-09-07 00:36:36 error Transaction status not supported
 2024-09-07 00:36:53 error jwt expired
+2024-09-07 01:14:24 error email is a required field
+2024-09-07 01:15:03 error Insufficient balance
+2024-09-07 01:15:14 error Insufficient balance
+2024-09-07 01:16:17 error You can't transfer to yourself

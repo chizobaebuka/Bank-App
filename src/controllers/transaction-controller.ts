@@ -2,12 +2,12 @@ import { Request, Response } from "express";
 import Utility from "../utils/index.utils";
 import { ResponseCode } from "../interfaces/enum/code-enum";
 import AccountService from "../services/account-service";
-import { IAccountCreationBody } from "../interfaces/account-interface";
+import { IAccount, IAccountCreationBody } from "../interfaces/account-interface";
 import PaymentService from "../services/payment-service";
 import TransactionService from "../services/transaction-service";
 import { TransactionStatus } from "../interfaces/enum/transaction-enum";
 import sequelize from "../database";
-import { IFindTransactionQuery } from "../interfaces/transaction-interface";
+import { IFindTransactionQuery, ITransaction } from "../interfaces/transaction-interface";
 
 class TransactionController {
     private transactionService: TransactionService;
@@ -32,6 +32,36 @@ class TransactionController {
         } catch (err) {
             await tx.rollback(); // Rollback on error
             return false;
+        }
+    }
+
+    private async transfer(senderAccount: IAccount, receiverAccount: IAccount, amount: number): Promise<{ status: boolean, transaction: ITransaction|null }> {
+        const tx = await sequelize.transaction();
+        try {
+            await this.accountService.topUpBalance(senderAccount.id, -amount, { transaction: tx });
+            await this.accountService.topUpBalance(receiverAccount.id, amount, { transaction: tx });
+
+            const newTransaction = {
+                userId: senderAccount.userId,
+                accountId: senderAccount.id,
+                amount,
+                detail: {
+                    receiverAccountNumber: receiverAccount.accountNumber,
+                },
+            }
+
+            let transfer = await this.transactionService.processInternalTransfer( newTransaction, { transaction: tx });
+            await tx.commit(); // Commit transaction
+            return {
+                status: true,
+                transaction: transfer
+            }
+        } catch (err) {
+            await tx.rollback(); // Rollback on error
+            return {
+                status: false,
+                transaction: null
+            }
         }
     }
     
@@ -92,6 +122,43 @@ class TransactionController {
         }
     }
     
+
+    async internalTransfer(req: Request, res: Response) {
+        try {
+            const params = { ...req.body };
+            const senderAccount = await this.accountService.getAccountByField({ id: params.senderAccountId });
+            if(!senderAccount) {
+                return Utility.handleError(res, "Sender account not found", ResponseCode.NOT_FOUND);
+            }
+
+            if(senderAccount.balance < params.amount) {
+                return Utility.handleError(res, "Insufficient balance", ResponseCode.BAD_REQUEST);
+            }
+
+            if(params.amount <= 0) {
+                return Utility.handleError(res, "Amount must be greater than zero", ResponseCode.BAD_REQUEST);
+            }
+
+            const receiverAccount = await this.accountService.getAccountByField({ accountNumber: params.receiverAccountNumber });
+            if(!receiverAccount) {
+                return Utility.handleError(res, "Receiver account not found", ResponseCode.NOT_FOUND);
+            }
+
+            if(senderAccount.userId === receiverAccount.userId) {
+                return Utility.handleError(res, "You can't transfer to yourself", ResponseCode.BAD_REQUEST);
+            }
+
+            const result = await this.transfer(senderAccount, receiverAccount, params.amount);
+            if(!result.status) {
+                return Utility.handleError(res, "Transfer failed", ResponseCode.NOT_FOUND);
+            }
+
+            return Utility.handleSuccess(res, "Transfer completed successfully", { transaction: result.transaction }, ResponseCode.SUCCESS);
+        } catch (error) {
+            return Utility.handleError(res, (error as TypeError).message, ResponseCode.SERVER_ERROR);
+            
+        }
+    }
 }
 
 export default TransactionController;

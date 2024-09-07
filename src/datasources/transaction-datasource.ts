@@ -9,8 +9,8 @@ class TransactionDataSource implements ITransactionDataSource {
         return await TransactionModel.findOne({ where: query.where });
     }
 
-    async create(data: ITransactionCreationBody): Promise<ITransaction> {
-        return await TransactionModel.create(data);
+    async create(data: ITransactionCreationBody, options?: Partial<IFindTransactionQuery>): Promise<ITransaction> {
+        return await TransactionModel.create(data, { returning: true, ...options });
     }
 
     async updateOne(searchBy: IFindTransactionQuery, data: Partial<ITransaction>): Promise<void> {

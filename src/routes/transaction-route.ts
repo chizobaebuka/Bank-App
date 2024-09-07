@@ -22,6 +22,10 @@ const createTransactionRoute = () => {
         return transactionController.verifyPaystackDeposit(req, res);
     })
 
+    router.post('/make-transfer', validator(validationSchema.makeInternalTransferSchema), Auth(), (req: Request, res: Response) => {
+        return transactionController.internalTransfer(req, res);
+    });
+
     return router;
 }
 

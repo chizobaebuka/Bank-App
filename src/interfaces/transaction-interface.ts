@@ -39,6 +39,6 @@ export interface ITransactionModel extends Model<ITransaction, ITransactionCreat
 
 export interface ITransactionDataSource {
     fetchOne(query: IFindTransactionQuery): Promise<ITransaction | null>;
-    create(data: ITransactionCreationBody): Promise<ITransaction>;
+    create(data: ITransactionCreationBody, options?: Partial<IFindTransactionQuery>): Promise<ITransaction>;
     updateOne(searchBy: IFindTransactionQuery, data: Partial<ITransaction>): Promise<void>;
 }
