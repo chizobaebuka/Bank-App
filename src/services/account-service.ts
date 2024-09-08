@@ -2,6 +2,7 @@ import sequelize from "../database";
 import AccountDataSource from "../datasources/account-datasource";
 import { IAccount, IAccountCreationBody, IAccountDataSource, IFindAccountQuery } from "../interfaces/account-interface";
 import { AccountStatus } from "../interfaces/enum/account-enum";
+import PaymentService from "./payment-service";
 
 class AccountService {
     private accountDataSource: AccountDataSource;
@@ -38,7 +39,7 @@ class AccountService {
     }
 
     async createAccount(data: Partial<IAccountCreationBody>) {
-        const record = { 
+        const record = {
             ...data,
             accountNumber: await this.createAccountNumber(),
             status: AccountStatus.ACTIVE,

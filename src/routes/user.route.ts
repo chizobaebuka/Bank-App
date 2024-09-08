@@ -22,6 +22,10 @@ const createUserRoute = () => {
         return userController.loginUser(req, res);
     })
 
+    router.post('/create-paystack-customer', validator(validationSchema.createPaystackCustomerSchema), (req: Request, res: Response) => {
+        return userController.createPaystackCustomer(req, res);
+    });
+    
     router.post('/forgot-password', validator(validationSchema.forgotPasswordSchema), (req: Request, res: Response) => {
         return userController.forgotPassword(req, res);
     })

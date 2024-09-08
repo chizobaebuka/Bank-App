@@ -12,27 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const transaction_model_1 = __importDefault(require("../models/transaction-model"));
-class TransactionDataSource {
+const payee_model_1 = __importDefault(require("../models/payee-model"));
+class PayeeDataSource {
+    create(record) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield payee_model_1.default.create(record);
+        });
+    }
     fetchOne(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield transaction_model_1.default.findOne({ where: query.where });
-        });
-    }
-    create(data, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield transaction_model_1.default.create(data, Object.assign({ returning: true }, options));
-        });
-    }
-    updateOne(searchBy, data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield transaction_model_1.default.update(data, { where: searchBy.where });
+            return yield payee_model_1.default.findOne(query);
         });
     }
     fetchAll(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield transaction_model_1.default.findAll({ where: query.where });
+            return yield payee_model_1.default.findAll(query);
+        });
+    }
+    updateOne(data, query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield payee_model_1.default.update(data, query);
         });
     }
 }
-exports.default = TransactionDataSource;
+exports.default = PayeeDataSource;

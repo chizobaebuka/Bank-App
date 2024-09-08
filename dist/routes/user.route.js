@@ -24,6 +24,15 @@ const createUserRoute = () => {
     router.post('/login', (0, index_middleware_1.validator)(user_validator_schema_1.default.loginSchema), (req, res) => {
         return userController.loginUser(req, res);
     });
+    router.post('/create-paystack-customer', (0, index_middleware_1.validator)(user_validator_schema_1.default.createPaystackCustomerSchema), (req, res) => {
+        return userController.createPaystackCustomer(req, res);
+    });
+    router.post('/create-dedicated-virtual-account', (0, index_middleware_1.validator)(user_validator_schema_1.default.createDedicatedVirtualPaystackAccountSchema), (req, res) => {
+        return userController.createDedicatedVirtualPaystackAccount(req, res);
+    });
+    router.post('/assign-dedicated-virtual-account', (0, index_middleware_1.validator)(user_validator_schema_1.default.assignDedicatedVirtualAccountSchema), (req, res) => {
+        return userController.assignDedicatedVirtualAccountNumber(req, res);
+    });
     router.post('/forgot-password', (0, index_middleware_1.validator)(user_validator_schema_1.default.forgotPasswordSchema), (req, res) => {
         return userController.forgotPassword(req, res);
     });

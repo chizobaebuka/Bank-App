@@ -5,17 +5,20 @@ import AccountService from "../services/account-service";
 import { IAccount, IAccountCreationBody } from "../interfaces/account-interface";
 import PaymentService from "../services/payment-service";
 import TransactionService from "../services/transaction-service";
-import { TransactionStatus } from "../interfaces/enum/transaction-enum";
+import { TransactionGateWay, TransactionStatus } from "../interfaces/enum/transaction-enum";
 import sequelize from "../database";
 import { IFindTransactionQuery, ITransaction } from "../interfaces/transaction-interface";
+import PayeeService from "../services/payee-service";
 
 class TransactionController {
     private transactionService: TransactionService;
     private accountService: AccountService;
+    private payeeService: PayeeService;
 
-    constructor(_transactionService: TransactionService, _accountService: AccountService) {
+    constructor(_transactionService: TransactionService, _accountService: AccountService, _payeeService: PayeeService) {
         this.transactionService = _transactionService;
         this.accountService = _accountService;
+        this.payeeService = _payeeService;
     }
 
     private async deposit(accountId: string, transactionId: string, amount: number): Promise<boolean> {
@@ -157,6 +160,115 @@ class TransactionController {
         } catch (error) {
             return Utility.handleError(res, (error as TypeError).message, ResponseCode.SERVER_ERROR);
             
+        }
+    }
+
+    async fetchBanksFromPaystack(req: Request, res: Response) {
+        try {
+            const banks = await PaymentService.fetchBanks();
+            return Utility.handleSuccess(res, "Banks fetched successfully", { banks }, ResponseCode.SUCCESS);
+        } catch (error) {
+            return Utility.handleError(res, (error as TypeError).message, ResponseCode.SERVER_ERROR);
+        }
+    }
+
+    async withdrawByPaystack(req: Request, res: Response) {
+        try {
+            const params = { ...req.body };
+            const senderAccount = await this.accountService.getAccountByField({ id: params.senderAccountId });
+            if(!senderAccount) {
+                return Utility.handleError(res, "Sender account not found", ResponseCode.NOT_FOUND);
+            }
+
+            console.log({ senderAccount })
+            if(senderAccount.balance < params.amount) {
+                return Utility.handleError(res, "Insufficient balance", ResponseCode.BAD_REQUEST);
+            }
+
+            if(params.amount <= 0) {
+                return Utility.handleError(res, "Amount must be greater than zero", ResponseCode.BAD_REQUEST);
+            }
+
+            let payeeRecord = await this.payeeService.fetchPayeeByAccountNumberAndBank(params.receiverAccountNumber, params.bankCode);
+            console.log({ payeeRecord })
+            let recepientId = "";
+            if (!payeeRecord) {
+                const isValidAccount = await PaymentService.verifyAccountNumber(params.receiverAccountNumber, params.bankCode);
+                console.log({ isValidAccount })
+    
+                if (!isValidAccount) {
+                    return Utility.handleError(res, "Invalid account details, please verify the account number and bank code.", ResponseCode.BAD_REQUEST);
+                }
+                const paystackPayeeRecord = {
+                    accountNumber: params.receiverAccountNumber,
+                    accountName: params.receiverAccountName,
+                    bankCode: params.bankCode,
+                }
+                recepientId =(await PaymentService.createPaystackRecipient(paystackPayeeRecord)) as string;
+                console.log({ recepientId })
+
+                if(recepientId) {
+                    payeeRecord = await this.payeeService.savePayeeRecord({
+                        userId: params.userId,
+                        accountNumber: params.receiverAccountNumber,
+                        accountName: params.receiverAccountName,
+                        bankCode: params.bankCode,
+                        detail: {
+                            paystackRecipientId: recepientId,
+                        },
+                    });
+                } else {
+                    return Utility.handleError(res, "Invalid Payment Account please try another payout method", ResponseCode.NOT_FOUND);
+                }
+            } else {
+                recepientId = payeeRecord.detail.paystackRecipientId as string;
+            }
+
+            const transferData = await PaymentService.initiatePaystackTransfer(recepientId, params.amount, params.message)
+            if(!transferData) {
+                return Utility.handleError(res, "Paystack transfer failed", ResponseCode.NOT_FOUND);
+            }
+
+            const result = await this.transferToExternalAccount(senderAccount, params.receiverAccountNumber, transferData.reference, params.amount);
+            if(!result.status) {
+                return Utility.handleError(res, "Failed to transfer to external account", ResponseCode.NOT_FOUND);
+            }
+
+
+            return Utility.handleSuccess(res, "Transfer initialized successfully", { transaction: result.transaction }, ResponseCode.SUCCESS);
+        } catch (error) {
+            return Utility.handleError(res, (error as TypeError).message, ResponseCode.SERVER_ERROR);
+            
+        }
+    }
+
+    private async transferToExternalAccount(senderAccount: IAccount, receiverAccount: IAccount, reference: string, amount: number): Promise<{ status: boolean, transaction: ITransaction|null }> {
+        const tx = await sequelize.transaction();
+        try {
+            await this.accountService.topUpBalance(senderAccount.id, -amount, { transaction: tx });
+            const newTransaction = {
+                userId: senderAccount.userId,
+                reference,
+                accountId: senderAccount.id,
+                amount,
+                detail: {
+                    receiverAccountNumber: receiverAccount.accountNumber,
+                    gateway: TransactionGateWay.PAYSTACK
+                },
+            }
+
+            let transfer = await this.transactionService.processExternalTransfer( newTransaction, { transaction: tx });
+            await tx.commit(); // Commit transaction
+            return {
+                status: true,
+                transaction: transfer
+            }
+        } catch (err) {
+            await tx.rollback(); // Rollback on error
+            return {
+                status: false,
+                transaction: null
+            }
         }
     }
 }

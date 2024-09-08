@@ -32,6 +32,10 @@ const UserModel = Db.define<IUserModel>('UserModel', {
         allowNull: false,
         unique: true,
     },
+    phone: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     role: {
         type: DataTypes.STRING,
         allowNull: true,

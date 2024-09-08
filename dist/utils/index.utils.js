@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const winston_1 = require("winston");
+const bank_enum_1 = require("../interfaces/enum/bank-enum");
 const printRed = (text) => {
     console.log(`\x1b[31m%s\x1b[0m`, `${text} \n`);
 };
@@ -47,6 +48,13 @@ const parseToObject = (value) => {
     }
     return data;
 };
+const getBankName = (bankCode) => {
+    const filter = bank_enum_1.BANKS.filter(item => (item.code == bankCode));
+    if (filter.length > 0) {
+        return filter[0].name;
+    }
+    return '';
+};
 const Utility = {
     printRed,
     handleError,
@@ -55,6 +63,7 @@ const Utility = {
     logger,
     isEmpty,
     escapeHtml,
-    parseToObject
+    parseToObject,
+    getBankName,
 };
 exports.default = Utility;

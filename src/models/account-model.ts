@@ -14,6 +14,11 @@ const AccountModel = Db.define<IAccountModel>('AccountModel', {
         type: DataTypes.UUID,
         allowNull: false,
     },
+    paystackCustomerId: {  // New field for Paystack customer ID
+        type: DataTypes.STRING,
+        allowNull: true, // Make it nullable initially
+        unique: true,    // Optional: if you want each ID to be unique
+    },
     accountNumber: {
         type: DataTypes.STRING,
         allowNull: false,

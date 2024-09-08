@@ -78,7 +78,7 @@ class AccountService {
             const update = {
                 balance: database_1.default.literal('balance + ' + amount)
             };
-            return this.accountDataSource.updateOne(filter, update);
+            return yield this.accountDataSource.updateOne(filter, update);
         });
     }
 }

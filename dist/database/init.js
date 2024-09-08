@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const account_model_1 = __importDefault(require("../models/account-model"));
+const payee_model_1 = __importDefault(require("../models/payee-model"));
 const token_model_1 = __importDefault(require("../models/token-model"));
 const transaction_model_1 = __importDefault(require("../models/transaction-model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
@@ -20,10 +21,11 @@ const index_1 = __importDefault(require("./index"));
 const DbInitialize = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield index_1.default.authenticate();
-        user_model_1.default.sync({ alter: false });
+        user_model_1.default.sync({ alter: true });
         token_model_1.default.sync({ alter: false });
-        account_model_1.default.sync({ alter: false });
+        account_model_1.default.sync({ alter: true });
         transaction_model_1.default.sync({ alter: false });
+        payee_model_1.default.sync({ alter: false });
     }
     catch (err) {
         console.log("Unable to connect to the database", err);

@@ -19,6 +19,7 @@ const index_utils_1 = __importDefault(require("../utils/index.utils"));
 const code_enum_1 = require("../interfaces/enum/code-enum");
 const email_service_1 = __importDefault(require("../services/email-service"));
 const moment_1 = __importDefault(require("moment"));
+const payment_service_1 = __importDefault(require("../services/payment-service"));
 class UserController {
     constructor(_userService, _tokenService) {
         this.userService = _userService;
@@ -46,6 +47,51 @@ class UserController {
                 const user = yield this.userService.createUser(newUser);
                 user.password = "";
                 return index_utils_1.default.handleSuccess(res, "User Registered Successfully", { user }, code_enum_1.ResponseCode.SUCCESS);
+            }
+            catch (e) {
+                res.status(500).json({ status: false, message: e.message });
+            }
+        });
+    }
+    createPaystackCustomer(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const params = Object.assign({}, req.body);
+                const paystackCustomer = yield payment_service_1.default.createPaystackCustomer(params.email, params.firstname, params.lastname, params.phone);
+                if (!paystackCustomer) {
+                    return index_utils_1.default.handleError(res, "Failed to create Paystack customer", code_enum_1.ResponseCode.SERVER_ERROR);
+                }
+                return index_utils_1.default.handleSuccess(res, "Paystack Customer Created Successfully", { paystackCustomer }, code_enum_1.ResponseCode.SUCCESS);
+            }
+            catch (e) {
+                res.status(500).json({ status: false, message: e.message });
+            }
+        });
+    }
+    createDedicatedVirtualPaystackAccount(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const params = Object.assign({}, req.body);
+                const virtualAccount = yield payment_service_1.default.generateDedicatedVirtualAccountNumber(params.customerId, params.preferredBank);
+                if (!virtualAccount) {
+                    return index_utils_1.default.handleError(res, "Failed to create virtual account", code_enum_1.ResponseCode.SERVER_ERROR);
+                }
+                return index_utils_1.default.handleSuccess(res, "Virtual Account Created Successfully", { virtualAccount }, code_enum_1.ResponseCode.SUCCESS);
+            }
+            catch (e) {
+                res.status(500).json({ status: false, message: e.message });
+            }
+        });
+    }
+    assignDedicatedVirtualAccountNumber(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const params = Object.assign({}, req.body);
+                const virtualAccount = yield payment_service_1.default.assignDedicatedVirtualAccount(params.email, params.firstName, params.lastName, params.phone, params.preferredBank, params.country);
+                if (!virtualAccount) {
+                    return index_utils_1.default.handleError(res, "Failed to assign virtual account", code_enum_1.ResponseCode.SERVER_ERROR);
+                }
+                return index_utils_1.default.handleSuccess(res, "Virtual Account Assigned Successfully", { virtualAccount }, code_enum_1.ResponseCode.SUCCESS);
             }
             catch (e) {
                 res.status(500).json({ status: false, message: e.message });

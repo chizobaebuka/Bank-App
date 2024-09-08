@@ -42,10 +42,31 @@ const resetPasswordSchema = yup.object({
     email: yup.string().email().lowercase().trim().required(),
     password: yup.string().min(6).required(),
 });
+const createPaystackCustomerSchema = yup.object({
+    email: yup.string().email().lowercase().trim().required(),
+    first_name: yup.string().lowercase().trim().required(),
+    last_name: yup.string().lowercase().trim().required(),
+    phone: yup.string().trim().required(), // Include the country code (e.g. +234) before the phone number
+});
+const createDedicatedVirtualPaystackAccountSchema = yup.object({
+    customerId: yup.number().required(),
+    preferedBank: yup.string().required(),
+});
+const assignDedicatedVirtualAccountSchema = yup.object({
+    email: yup.string().email().lowercase().trim().required(),
+    first_name: yup.string().lowercase().trim().required(),
+    last_name: yup.string().lowercase().trim().required(),
+    phone: yup.string().trim().required(), // Include the country code (e.g. +234) before the phone number
+    preferedBank: yup.string().required(),
+    country: yup.string().required(),
+});
 const validationSchema = {
     registerSchema,
     loginSchema,
     forgotPasswordSchema,
     resetPasswordSchema,
+    createPaystackCustomerSchema,
+    createDedicatedVirtualPaystackAccountSchema,
+    assignDedicatedVirtualAccountSchema,
 };
 exports.default = validationSchema;

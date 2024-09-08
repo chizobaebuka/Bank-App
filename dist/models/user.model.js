@@ -35,6 +35,10 @@ const UserModel = index_1.default.define('UserModel', {
         allowNull: false,
         unique: true,
     },
+    phone: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true,
+    },
     role: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: true,

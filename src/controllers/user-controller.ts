@@ -9,6 +9,7 @@ import { ResponseCode } from "../interfaces/enum/code-enum";
 import TokenService from "../services/token-service";
 import EmailService from "../services/email-service";
 import moment from "moment";
+import PaymentService from "../services/payment-service";
 
 class UserController {
     private userService: UserService;
@@ -27,6 +28,7 @@ class UserController {
                 firstname: params.firstname,
                 lastname: params.lastname,
                 email: params.email,
+                phone: params.phone,
                 username: params.email.split("@")[0],
                 password: params.password,
                 role: UserRoles.CUSTOMER,
@@ -50,6 +52,20 @@ class UserController {
         }
     }
 
+    async createPaystackCustomer(req: Request, res: Response) {
+        try {
+            const params = { ...req.body }
+            const paystackCustomer = await PaymentService.createPaystackCustomer(params.email, params.firstname, params.lastname, params.phone);
+            if (!paystackCustomer) {
+                return Utility.handleError(res, "Failed to create Paystack customer", ResponseCode.SERVER_ERROR);
+            }
+
+            return Utility.handleSuccess(res, "Paystack Customer Created Successfully", { paystackCustomer }, ResponseCode.SUCCESS);
+        } catch (e: any) {
+            res.status(500).json({ status: false, message: e.message });
+        }
+    }
+    
     async loginUser(req: Request, res: Response) {
         try {
             const params = { ...req.body };

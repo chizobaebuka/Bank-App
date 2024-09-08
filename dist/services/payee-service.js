@@ -8,31 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const transaction_model_1 = __importDefault(require("../models/transaction-model"));
-class TransactionDataSource {
-    fetchOne(query) {
+class PayeeService {
+    constructor(_payeeDataSource) {
+        this.payeeDataSource = _payeeDataSource;
+    }
+    fetchPayeeByAccountNumberAndBank(accountNumber, bankCode) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield transaction_model_1.default.findOne({ where: query.where });
+            const query = { where: { accountNumber, bankCode }, raw: true };
+            return yield this.payeeDataSource.fetchOne(query);
         });
     }
-    create(data, options) {
+    savePayeeRecord(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield transaction_model_1.default.create(data, Object.assign({ returning: true }, options));
-        });
-    }
-    updateOne(searchBy, data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield transaction_model_1.default.update(data, { where: searchBy.where });
-        });
-    }
-    fetchAll(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield transaction_model_1.default.findAll({ where: query.where });
+            const record = Object.assign(Object.assign({}, data), { detail: Object.assign({}, data.detail) });
+            return yield this.payeeDataSource.create(record);
         });
     }
 }
-exports.default = TransactionDataSource;
+exports.default = PayeeService;

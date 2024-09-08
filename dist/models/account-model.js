@@ -17,6 +17,11 @@ const AccountModel = index_1.default.define('AccountModel', {
         type: sequelize_1.DataTypes.UUID,
         allowNull: false,
     },
+    paystackCustomerId: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true, // Make it nullable initially
+        unique: true, // Optional: if you want each ID to be unique
+    },
     accountNumber: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
