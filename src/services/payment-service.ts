@@ -232,8 +232,6 @@ class PaymentService {
     
             const validBanks = banksResponse.data.data;
             const isValidBankCode = validBanks.some((bank: any) => bank.code === bankCode);
-    
-            // Validate bank code
             if (!isValidBankCode) {
                 console.error('Invalid bank code provided. Please use the correct bank code.');
                 return false;
