@@ -3,7 +3,6 @@ import { IAccount, IAccountCreationBody, IAccountDataSource, IFindAccountQuery }
 import { IFindTransactionQuery, ITransaction, ITransactionCreationBody, ITransactionDataSource } from "../interfaces/transaction-interface";
 import TransactionModel from "../models/transaction-model";
 
-
 class TransactionDataSource implements ITransactionDataSource {
     async fetchOne(query: IFindTransactionQuery): Promise<ITransaction | null> {
         return await TransactionModel.findOne({ where: query.where });
